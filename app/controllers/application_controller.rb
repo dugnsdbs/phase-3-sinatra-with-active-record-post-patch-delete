@@ -9,11 +9,48 @@ class ApplicationController < Sinatra::Base
   get '/games/:id' do
     game = Game.find(params[:id])
 
-    game.to_json(only: [:id, :title, :genre, :price], include: {
-      reviews: { only: [:comment, :score], include: {
-        user: { only: [:name] }
-      } }
-    })
+    game.to_json(only: [:id, :title, :genre, :price],
+       include: {
+            reviews: { only: [:comment, :score], 
+                      include: { user: { only: [:name] }
+                                }}
+                })
   end
+
+  get '/reviews' do
+    review = Review.all 
+    review.to_json
+  end
+
+  get '/reviews/:id' do
+    review = Review.find(params[:id]) 
+    review.to_json
+  end
+
+  delete '/reviews/:id' do
+    reviews = Review.find(params[:id])
+    reviews.destroy
+    reviews.to_json
+  end
+
+  post '/reviews' do
+      reviews = Review.create(
+        score:params[:score],
+        comment:params[:comment], 
+        game_id:params[:game_id], 
+        user_id:params[:user_id]
+      )
+      reviews.to_json
+  end
+
+  patch '/reviews/:id' do
+    review = Review.find(params[:id])
+    review.update(
+      score:params[:score],
+      comment:params[:comment]
+    )
+    review.to_json
+  end
+
 
 end
